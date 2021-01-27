@@ -1164,6 +1164,11 @@ let (|PatNamed|_|) =
     | SynPat.Named (p, IdentOrKeyword (OpNameFullInPattern (s, _)), _, ao, _) -> Some(ao, p, s)
     | _ -> None
 
+let (|PatSingleNamed|_|) =
+    function
+    | SynPat.Named (PatNullary option as p, IdentOrKeyword (OpNameFullInPattern (s, _)), _, ao, _) -> Some(ao, p, s)
+    | _ -> None
+
 let (|PatLongIdent|_|) =
     function
     | SynPat.LongIdent (LongIdentWithDots.LongIdentWithDots (LongIdentOrKeyword (OpNameFullInPattern (s, _)), _),

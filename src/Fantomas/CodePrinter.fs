@@ -4475,11 +4475,16 @@ and genPat astContext pat =
             +> ifElse hasBracket sepCloseT sepNone
 
     | PatParen (PatConst (Const "()", _)) -> !- "()"
+    | PatParen (PatSingleNamed _ as p) when astContext.IsInsideMatchClausePattern ->
+        genPat astContext p
+        +> enterNodeTokenByName pat.Range RPAREN
+
     | PatParen (p) ->
         sepOpenT
         +> genPat astContext p
         +> enterNodeTokenByName pat.Range RPAREN
         +> sepCloseT
+
     | PatTuple ps ->
         expressionFitsOnRestOfLine
             (col sepComma ps (genPat astContext))
