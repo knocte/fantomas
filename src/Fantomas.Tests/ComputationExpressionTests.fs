@@ -1893,6 +1893,7 @@ async {
 }
 """
 
+//Stack Overflow error
 [<Test>]
 let ``don't repeat new line trivia before closing brace, 1137`` () =
     formatSourceString
