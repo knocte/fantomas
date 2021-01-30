@@ -5,7 +5,7 @@ open FsUnit
 open Fantomas.Tests.TestHelper
 
 [<Test>]
-let ``parentheses around single identifiers in match patterns are unnecessary`` () =
+let ``parentheses around single identifiers in match patterns are unnecessary, 684`` () =
     formatSourceString
         false
         """
@@ -25,12 +25,12 @@ match foo with
 """
 
 [<Test>]
-let ``comments around single identifiers with unnecessary parenthesis should be preserved `` () =
+let ``parentheses around non-single identifiers in match patterns are kept, I`` () =
     formatSourceString
         false
         """
 match foo with
-| Bar (baz) (* comment *) -> ()
+| Bar (Baz baz) -> ()
 | _ ->
     failwith "xxx"
 """
@@ -40,6 +40,27 @@ match foo with
         equal
         """
 match foo with
-| Bar baz (* comment *) -> ()
+| Bar (Baz baz) -> ()
+| _ -> failwith "xxx"
+"""
+
+
+[<Test>]
+let ``parentheses around non-single identifiers in match patterns are kept, II`` () =
+    formatSourceString
+        false
+        """
+match foo with
+| Bar ({ Baz = baz } as x) -> ()
+| _ ->
+    failwith "xxx"
+"""
+        config
+    |> prepend newline
+    |> should
+        equal
+        """
+match foo with
+| Bar ({ Baz = baz } as x) -> ()
 | _ -> failwith "xxx"
 """
