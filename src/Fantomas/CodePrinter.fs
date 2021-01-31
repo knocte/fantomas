@@ -4480,9 +4480,14 @@ and genPat astContext pat =
     | PatParen (PatConst (Const "()", _)) -> !- "()"
     // PatNamed with expanded pattern
 //    | PatParen (PatNamed (_, _, ident) as p ) when astContext.IsInsideMatchClausePattern ->
-    | PatParen (PatNamed _ as p) when astContext.IsInsideMatchClausePattern ->
+    | PatParen (PatTest _ as p) when astContext.IsInsideMatchClausePattern ->
         genPat astContext p
         +> enterNodeTokenByName pat.Range RPAREN
+    //    | PatParen (PatNamed (_, _, _) as p) when astContext.IsInsideMatchClausePattern ->
+    // PatNullary
+    // PatRecord
+//        genPat astContext p
+//        +> enterNodeTokenByName pat.Range RPAREN
     (*
             enterNodeTokenByName will print the trivia linked to RPAREN
             verify if comment position changes if I use Ident instead
