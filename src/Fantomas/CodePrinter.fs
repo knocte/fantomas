@@ -1612,7 +1612,6 @@ and genExpr astContext synExpr ctx =
         | Match (e, cs) ->
             atCurrentColumn (
                 !- "match "
-                // Track here that SynPat : Paren(p) for 'baz' came from a match
                 +> atCurrentColumnIndent (genExpr astContext e)
                 +> enterNodeTokenByName synExpr.Range WITH
                 // indent 'with' further if trivia was printed so that is appear after the match keyword.
@@ -4129,8 +4128,6 @@ and genClause astContext hasBar (Clause (p, e, eo) as ce) =
         { astContext with
               IsInsideMatchClausePattern = true }
 
-    // p -> LongIdent( ... SynArgPats[ SynPat.Named['baz'] )
-
     let pat =
         genPat astCtx p
         +> optPre
@@ -4478,18 +4475,11 @@ and genPat astContext pat =
             +> ifElse hasBracket sepCloseT sepNone
 
     | PatParen (PatConst (Const "()", _)) -> !- "()"
-    // PatNamed with expanded pattern
-//    | PatParen (PatNamed (_, _, ident) as p ) when astContext.IsInsideMatchClausePattern ->
-    | PatParen (PatTest _ as p) when astContext.IsInsideMatchClausePattern ->
+    | PatParen (PatSingleNamed _ as p) when astContext.IsInsideMatchClausePattern ->
         genPat astContext p
         +> enterNodeTokenByName pat.Range RPAREN
-    //    | PatParen (PatNamed (_, _, _) as p) when astContext.IsInsideMatchClausePattern ->
-    // PatNullary
-    // PatRecord
-//        genPat astContext p
-//        +> enterNodeTokenByName pat.Range RPAREN
-    (*
-            enterNodeTokenByName will print the trivia linked to RPAREN
+        (*
+            enterNodeTokenByName will print the trivia linked to RPAREN,
             verify if comment position changes if I use Ident instead
         *)
     | PatParen (p) ->

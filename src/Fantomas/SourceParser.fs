@@ -1164,7 +1164,7 @@ let (|PatNamed|_|) =
     | SynPat.Named (p, IdentOrKeyword (OpNameFullInPattern (s, _)), _, ao, _) -> Some(ao, p, s)
     | _ -> None
 
-let (|PatTest|_|) =
+let (|PatSingleNamed|_|) =
     function
     | SynPat.Named (PatNullary option as p, IdentOrKeyword (OpNameFullInPattern (s, _)), _, ao, _) -> Some(ao, p, s)
     | _ -> None
