@@ -4478,7 +4478,7 @@ and genPat astContext pat =
     | PatParen (PatSingleNamed _ as p) when astContext.IsInsideMatchClausePattern ->
         genPat astContext p
         +> enterNodeTokenByName pat.Range RPAREN
-        (*
+    (*
             enterNodeTokenByName will print the trivia linked to RPAREN,
             verify if comment position changes if I use Ident instead
         *)
