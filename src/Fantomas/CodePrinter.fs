@@ -913,12 +913,17 @@ and genAnonRecordFieldName astContext (AnonRecordFieldName (s, e)) =
 
     !-s +> sepEq +> expr
 
-and genTuple astContext es =
+and genTuple astContext es baseCtorCall =
     let genShortExpr astContext e =
         addParenForTupleWhen (genExpr astContext) e
 
-    let shortExpression =
-        col sepComma es (genShortExpr astContext)
+    let sep =
+        if baseCtorCall then
+            (sepComma +> sepNln)
+        else
+            sepComma
+
+    let shortExpression = col sep es (genShortExpr astContext)
 
     let longExpression =
         let containsLambdaOrMatchExpr =
@@ -1232,11 +1237,22 @@ and genExpr astContext synExpr ctx =
             +> genType astContext false t
             +> sepSpace
             +> genExpr astContext e
-        | Tuple (es, _) -> genTuple astContext es
+        | Tuple (es, _) ->
+            let rec listContainsInherit list =
+                match list with
+                | (")") :: _ -> false
+                | ("    inherit BaseExceptionWithLongNaaaameException") :: p -> true
+                | _ :: tail -> listContainsInherit tail
+                | [] -> false
+
+            let baseCtorCall =
+                listContainsInherit ctx.WriterModel.Lines
+
+            genTuple astContext es baseCtorCall
         | StructTuple es ->
             !- "struct "
             +> sepOpenT
-            +> genTuple astContext es
+            +> genTuple astContext es false
             +> sepCloseT
         | ArrayOrList (isArray, [], _) ->
             ifElse
@@ -1611,9 +1627,19 @@ and genExpr astContext synExpr ctx =
                 +> atCurrentColumn (genExpr astContext e)
                 +> sepCloseTFor rpr pr
             | _ ->
-                sepOpenTFor lpr
-                +> genExpr astContext e
-                +> sepCloseTFor rpr pr
+                //sepOpenTFor lpr
+                //+> genExpr astContext e
+                //+> sepCloseTFor rpr pr
+                indent
+                +> sepNln
+                +> indent
+                +> (sepOpenTFor lpr
+                    +> sepNln
+                    +> genExpr astContext e
+                    +> unindent
+                    +> sepNln
+                    +> unindent
+                    +> sepCloseTFor rpr pr)
         | CompApp (s, e) ->
             !-s
             +> sepSpace
@@ -2525,6 +2551,8 @@ and genExpr astContext synExpr ctx =
                 id)
 
     expr ctx
+
+and genExprInherit astContext synExpr ctx node = genExpr astContext synExpr ctx
 
 and genInfixOperator operatorText (operatorExpr: SynExpr) =
     (!-operatorText
@@ -4567,6 +4595,7 @@ and genMemberDefn astContext node =
         let genCtor =
             let shortExpr =
                 optPre sepSpace sepSpace ao genAccess
+                //+> sepNln
                 +> ((sepOpenT
                      +> col sepComma (simplePats ps) (genSimplePat astContext)
                      +> sepCloseT)
