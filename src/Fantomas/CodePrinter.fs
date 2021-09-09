@@ -1240,8 +1240,8 @@ and genExpr astContext synExpr ctx =
         | Tuple (es, _) ->
             let rec listContainsInherit list =
                 match list with
-                | (")") :: _ -> false
-                | ("    inherit BaseExceptionWithLongNaaaameException") :: p -> true
+                | ")" :: _ -> false
+                | x :: p when x.Contains " inherit " -> true
                 | _ :: tail -> listContainsInherit tail
                 | [] -> false
 
