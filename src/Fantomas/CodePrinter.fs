@@ -582,13 +582,7 @@ and genTypeAndParam astContext typeName tds tcs preferPostfix =
     elif preferPostfix then
         !-typeName +> types "<" ">"
     elif List.atMostOne tds then
-        genTyparDecl
-            { astContext with
-                  IsFirstTypeParam = true }
-            (List.head tds)
-        +> sepSpace
-        -- typeName
-        +> colPre (!- " when ") wordAnd tcs (genTypeConstraint astContext)
+        !-typeName +> types "<" ">"
     else
         types "(" ")" -- " " -- typeName
 
@@ -4212,7 +4206,7 @@ and genType astContext outerBracket t =
             let postForm =
                 match ts with
                 | [] -> loop t
-                | [ t' ] -> loop t' +> sepSpace +> loop t
+                | [ t' ] -> loop t +> sepOpenAng +> loop t' +> sepCloseAng
                 | ts ->
                     sepOpenT
                     +> col sepComma ts loop
