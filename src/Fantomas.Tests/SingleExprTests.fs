@@ -213,3 +213,21 @@ let ``comment after address of tokens`` () =
 && // comment
     foobar
 """
+
+[<Test>]
+let ``function call with more than 1 curried parameter, 28141`` () =
+    formatSourceString
+        false
+        """
+module Foo =
+    let Bar (baz1: int) (baz2: string) = FooBarBaz (someFunc x) (someOtherFunc y)
+"""
+        config
+    |> prepend newline
+    |> should
+        equal
+        """
+module Foo =
+    let Bar (baz1: int) (baz2: string) =
+        FooBarBaz (someFunc x) (someOtherFunc y)
+"""
