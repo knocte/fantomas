@@ -215,12 +215,13 @@ let ``comment after address of tokens`` () =
 """
 
 [<Test>]
-let ``function call with more than 1 curried parameter, 28141`` () =
+let ``function invocation with multipled curried parameter`` () =
     formatSourceString
         false
         """
 module Foo =
-    let Bar (baz1: int) (baz2: string) = FooBarBaz (someFunc x) (someOtherFunc y)
+    let Bar (baz1: int) (baz2: string) (baz3: string) (baz4: string) =
+        FooBarBaz(someFunc x) (someOtherFunc y)
 """
         config
     |> prepend newline
@@ -228,6 +229,6 @@ module Foo =
         equal
         """
 module Foo =
-    let Bar (baz1: int) (baz2: string) =
+    let Bar (baz1: int) (baz2: string) (baz3: string) (baz4: string) =
         FooBarBaz (someFunc x) (someOtherFunc y)
 """
