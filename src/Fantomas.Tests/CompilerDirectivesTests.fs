@@ -2011,7 +2011,7 @@ let ``compiler defines around parameter type definition, no defines`` () =
 let UpdateUI
     (theModel:
 #if NETCOREAPP2_1
-
+               ITreeModel
 #else
                TreeModel
 #endif
